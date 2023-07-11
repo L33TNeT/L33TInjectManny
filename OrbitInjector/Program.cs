@@ -25,21 +25,24 @@ namespace CSGOInjector
             ProcessListForm f1 = new ProcessListForm();
             Application.Run(f1);
 
-            Console.WriteLine("Please choose a .DLL to inject... (opening file selector)");
-            try
+            if (f1.ProcessName != string.Empty)
             {
-                if (VACBypass.Run(GetPathDLL()))
+                Console.WriteLine("Please choose a .DLL to inject... (opening file selector)");
+                try
                 {
-                    MessageBox.Show("DLL injected!", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    if (VACBypass.Run(f1.ProcessName, GetPathDLL()))
+                    {
+                        MessageBox.Show("DLL injected!", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    MessageBox.Show("Failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

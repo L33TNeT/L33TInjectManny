@@ -35,11 +35,11 @@ namespace CSGOInjector
         private static IntPtr hGame = IntPtr.Zero;
         private static UInt32 pid = UInt32.MinValue;
 
-        public static bool Run(string pathToDLL)
+        public static bool Run(string program_name, string pathToDLL)
         {
             Init();
 
-            pid = GetGamePID();
+            pid = GetGamePID(program_name);
 
             if (pid == UInt32.MinValue)
             {
@@ -113,10 +113,10 @@ namespace CSGOInjector
             CloseHandle(handle);
         }
 
-        private static UInt32 GetGamePID()
+        private static UInt32 GetGamePID(string prog_name)
         {
             UInt32 ret = UInt32.MinValue;
-            Process[] proc = Process.GetProcessesByName("csgo");
+            Process[] proc = Process.GetProcessesByName(prog_name);
 
             if (proc.Length == 0)
             {

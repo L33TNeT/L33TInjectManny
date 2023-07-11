@@ -43,10 +43,16 @@ namespace OrbitInjector
 
         private void button_attachproc_Click(object sender, EventArgs e)
         {
-
+            ((ProcessListForm)this.ParentForm).ProcessName = this.comboBox1.Text;
+            this.ParentForm.Close();
         }
 
         private void button_refreshproc_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ProcessListUC_Load(object sender, EventArgs e)
         {
 
         }

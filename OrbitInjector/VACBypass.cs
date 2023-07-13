@@ -5,19 +5,22 @@ using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Windows.Forms;
 
 namespace CSGOInjector
 {
     public static class VACBypass
     {
-        private static List<FuncDLL> _functions = new List<FuncDLL>()
+        private static readonly List<FuncDLL> _functions = new List<FuncDLL>()
         {
+            new FuncDLL("GetAsyncKeyState", "user32"),
             new FuncDLL("LoadLibraryExW", "kernel32"),
             new FuncDLL("VirtualAlloc", "kernel32"),
             new FuncDLL("FreeLibrary", "kernel32"),
             new FuncDLL("LoadLibraryExA", "kernel32"),
             new FuncDLL("LoadLibraryW", "kernel32"),
             new FuncDLL("LoadLibraryA", "kernel32"),
+            new FuncDLL("AllocConsole", "kernel32"),
             new FuncDLL("VirtualAllocEx", "kernel32"),
             new FuncDLL("LdrLoadDll", "ntdll"),
             new FuncDLL("NtOpenFile", "ntdll"),
@@ -28,7 +31,7 @@ namespace CSGOInjector
             new FuncDLL("FreeLibrary", "KernelBase"),
             new FuncDLL("LoadLibraryExA", "KernelBase"),
             new FuncDLL("LoadLibraryExW", "KernelBase"),
-            new FuncDLL("ResumeThread", "KernelBase")
+            new FuncDLL("ResumeThread", "KernelBase"),
         };
 
         private static byte[,] originalBytes;
@@ -53,16 +56,21 @@ namespace CSGOInjector
                 throw new ApplicationException("Failed to open process.");
             }
 
+
+            Console.WriteLine("Please choose a .DLL to inject... (opening file selector 0)");
             UnhookProtectedFuncs();
+            Console.WriteLine("Please choose a .DLL to inject... (opening file selector 1)");
             InjectDLL(pathToDLL);
+            Console.WriteLine("Please choose a .DLL to inject... (opening file selector 2)");
             hookProtectedFuncs();
+            Console.WriteLine("Please choose a .DLL to inject... (opening file selector 3)");
 
             return true;
         }
 
         private static void Init()
         {
-            originalBytes = new byte[17, 6];
+            originalBytes = new byte[170, 6];
             hGame = IntPtr.Zero;
             pid = UInt32.MinValue;
         }
@@ -100,6 +108,25 @@ namespace CSGOInjector
             {
                 throw new ApplicationException("Failed to load LoadLibraryA.");
             }
+            
+            // ingame bo2 money injection
+            byte[] read_Money = { 0x00, 0x00, 0x00, 0x00 };
+            byte[] read_ammo1 = { 0x00, 0x00, 0x00, 0x00 };
+            byte[] read_ammo2 = { 0x00, 0x00, 0x00, 0x00 };
+            byte[] read_ammo3 = { 0x00, 0x00, 0x00, 0x00 };
+
+            byte[] write_Money = BitConverter.GetBytes(51337);
+            byte[] write_godmode = BitConverter.GetBytes(1);
+            //HERE WERE ARE JUST READING--------------------------------------------
+            ReadProcessMemory(handle, (IntPtr)0x0234C068, read_Money, sizeof(int), out _);
+            ReadProcessMemory(handle, (IntPtr)0x02346E90, read_ammo1, sizeof(int), out _);
+            ReadProcessMemory(handle, (IntPtr)0x02346E98, read_ammo2, sizeof(int), out _);
+            ReadProcessMemory(handle, (IntPtr)0x02346E8C, read_ammo3, sizeof(int), out _);
+            WriteProcessMemory(handle, (IntPtr)0x0234C068, write_Money, sizeof(int), out _);
+            WriteProcessMemory(handle, (IntPtr)0x01080090, write_godmode, sizeof(int), out _);
+
+            // inject end
+
 
             IntPtr threadHandle = CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryAAddress, DLLMemory, 0, 
                 IntPtr.Zero);
@@ -139,10 +166,13 @@ namespace CSGOInjector
         {
             for (int i = 0; i < _functions.Count; i++)
             {
+
                 if (!Unhook(_functions[i].MethodName, _functions[i].DLLName, i))
                 {
                     throw new ApplicationException($"Failed unhook {_functions[i].MethodName} in {_functions[i].DLLName}.");
                 }
+
+                Console.WriteLine($"unhooked {_functions[i].MethodName} in {_functions[i].DLLName}.");
             }
         }
 
@@ -166,11 +196,15 @@ namespace CSGOInjector
                 throw new ApplicationException($"The {methodName} address in {dllName} is zero.");
             }
 
+            Console.WriteLine("Reading hook memory");
+
             byte[] originalGameBytes = new byte[6];
 
             ReadProcessMemory(hGame, originalMethodAddress, originalGameBytes, sizeof(byte) * 6, out _);
 
-            for (int i = 0; i < originalGameBytes.Length; i++)
+            Console.WriteLine("read hook memory");
+
+            for (int i = 0; i < 6; i++)
             {
                 originalBytes[index, i] = originalGameBytes[i];
             }
@@ -180,8 +214,10 @@ namespace CSGOInjector
             GCHandle pinnedArray = GCHandle.Alloc(originalDLLBytes, GCHandleType.Pinned);
             IntPtr originalDLLBytesPointer = pinnedArray.AddrOfPinnedObject();
 
+            Console.WriteLine("Converting method address");
             memcpy(originalDLLBytesPointer, originalMethodAddress, (UIntPtr)(sizeof(byte) * 6));
 
+            Console.WriteLine("Writing new hidden HOOK ADDRESS");
             return WriteProcessMemory(hGame, originalMethodAddress, originalDLLBytes, sizeof(byte) * 6, out _);
         }
 
@@ -219,6 +255,8 @@ namespace CSGOInjector
         #region Win32 DLL Enum
 
         private const UInt32 INFINITY = 0xFFFFFFFF;
+
+        private static List<FuncDLL> Functions => _functions;
 
         [Flags]
         public enum ProcessAccessFlags : uint
@@ -279,6 +317,9 @@ namespace CSGOInjector
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
+        [DllImport("User32.dll")]
+        public static extern short GetAsyncKeyState(Keys ArrowKeys);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern IntPtr LoadLibrary(string lpFileName);
 
@@ -287,6 +328,9 @@ namespace CSGOInjector
 
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern IntPtr memcpy(IntPtr dest, IntPtr src, UIntPtr count);
+
+        [DllImport("kernel32")]
+        public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
 
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, AllocationType flAllocationType, MemoryProtection flProtect);
@@ -309,6 +353,10 @@ namespace CSGOInjector
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]

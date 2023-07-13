@@ -20,3 +20,14 @@ C:\Users\rayth\OneDrive\Desktop\OrbitInjector-main\OrbitInjector\obj\Debug\Orbit
 C:\Users\rayth\OneDrive\Desktop\OrbitInjector-main\OrbitInjector\obj\Debug\OrbitInjector.csproj.CoreCompileInputs.cache
 C:\Users\rayth\OneDrive\Desktop\OrbitInjector-main\OrbitInjector\obj\Debug\OrbitInjector.exe
 C:\Users\rayth\OneDrive\Desktop\OrbitInjector-main\OrbitInjector\obj\Debug\OrbitInjector.pdb
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\bin\Debug\OrbitInjector.exe.config
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\bin\Debug\OrbitInjector.exe
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\bin\Debug\OrbitInjector.pdb
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.csproj.AssemblyReference.cache
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.csproj.SuggestedBindingRedirects.cache
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.ProcessListForm.resources
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.ProcessListUC.resources
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.csproj.GenerateResource.cache
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.csproj.CoreCompileInputs.cache
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.exe
+C:\Users\rayth\OneDrive\Documents\GitHub\L33TInjectManny\OrbitInjector\obj\Debug\OrbitInjector.pdb
